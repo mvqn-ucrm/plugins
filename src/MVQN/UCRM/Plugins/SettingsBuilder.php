@@ -8,8 +8,8 @@ use Nette\PhpGenerator\PhpNamespace;
 
 final class SettingsBuilder
 {
-    private const CLASS_NAME = "Settings";
-    private const CLASS_NAMESPACE = "MVQN\\UCRM\\Plugins";
+    private const DEFAULT_CLASSNAME = "Settings";
+    private const DEFAULT_NAMESPACE = "MVQN\\UCRM\\Plugins";
 
     /**
      * Generates a class with auto-implemented methods and then saves it to a PSR-4 compatible file.
@@ -18,8 +18,12 @@ final class SettingsBuilder
      */
     public static function generate(array $constants = []): void
     {
-        $root = Plugin::usingZip() ? Plugin::projectRoot()."/zip/" : Plugin::projectRoot();
-        $path = $root."src/".str_replace("\\", "/", self::CLASS_NAMESPACE);
+        // Add any any set of constants that were passed...
+        foreach($constants as $name => $value)
+            self::addConstant($name, $value);
+
+        $root = Plugin::pluginPath();
+        $path = $root."/src/".str_replace("\\", "/", self::DEFAULT_NAMESPACE);
 
         if(!file_exists($root."/manifest.json"))
             return;
@@ -30,21 +34,29 @@ final class SettingsBuilder
         $data = json_decode(file_get_contents($root."/manifest.json"), true);
         $data = array_key_exists("configuration", $data) ? $data["configuration"] : [];
 
-        $_namespace = new PhpNamespace(self::CLASS_NAMESPACE);
+        $_namespace = new PhpNamespace(self::DEFAULT_NAMESPACE);
         //$_namespace->addUse("MVQN\\UCRM\\Plugins\\SettingsBase");
         $_namespace->addUse(SettingsBase::class);
 
-        $_class = $_namespace->addClass(self::CLASS_NAME);
+        $_class = $_namespace->addClass(self::DEFAULT_CLASSNAME);
         $_class
             ->setFinal()
             ->setExtends(SettingsBase::class)
             ->addComment("@author Ryan Spaeth <rspaeth@mvqn.net>\n");
 
-        $filePath = realpath($path."/".self::CLASS_NAME.".php");
+        $filePath = realpath($path."/".self::DEFAULT_CLASSNAME.".php");
 
         $_class->addConstant("FILE_PATH", $filePath)
             ->setVisibility("protected")
-            ->addComment("@const string The full path of this Settings file.");
+            ->addComment("@const string The absolute path of this Settings file.");
+
+        $_class->addConstant("PROJECT_ROOT", Plugin::projectRoot())
+            ->setVisibility("public")
+            ->addComment("@const string The absolute path to the root of this project.");
+
+        $_class->addConstant("PROJECT_CODE", Plugin::pluginPath())
+            ->setVisibility("public")
+            ->addComment("@const string The absolute path to the code root of this project.");
 
         if(file_exists($root."/ucrm.json"))
         {
@@ -67,8 +79,11 @@ final class SettingsBuilder
                 ->addComment("@const string An automatically generated UCRM API 'App Key' with read/write access.");
         }
 
-        foreach($constants as $constant)
-            $_class->addMember($constant);
+        if(self::$constants !== null)
+        {
+            foreach (self::$constants as $constant)
+                $_class->addMember($constant);
+        }
 
         foreach($data as $setting)
         {
@@ -97,9 +112,43 @@ final class SettingsBuilder
         // Hack to add extra line return between const declarations...
         $code = str_replace(";\n\t/** @const", ";\n\n\t/** @const", $code);
 
-        file_put_contents($path."/".self::CLASS_NAME.".php", $code);
+        file_put_contents($path."/".self::DEFAULT_CLASSNAME.".php", $code);
 
     }
+
+
+    /** @var Constant[] */
+    private static $constants;
+
+    /**
+     * @param string $name The name of the constant to append to this Settings class.
+     * @param mixed $value The value of the constant to append to this Settings class.
+     * @param string $comment An optional comment for this constant.
+     * @throws \Exception
+     */
+    public static function addConstant(string $name, $value, string $comment = "")
+    {
+        if(self::$constants === null)
+            self::$constants = [];
+
+        if(array_key_exists($name, self::$constants))
+            return; // Already Exists!
+
+        $constant = new Constant($name);
+
+        if($comment)
+            $constant->setComment("@const ".gettype($value)." ".$comment);
+        else
+            $constant->setComment("@const ".gettype($value));
+
+        $constant
+            ->setVisibility("public")
+            ->setValue($value);
+
+        self::$constants[] = $constant;
+    }
+
+
 
 
 }

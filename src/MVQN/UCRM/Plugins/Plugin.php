@@ -64,7 +64,7 @@ final class Plugin
         $projectRoot = realpath($vendorRoot."/../");
 
         // IF the next two upper directories are recognized as composer's vendor folder and this package name...
-        if(basename($mvqnRoot) === "mvqn" && basename($vendorRoot) === "vendor")
+        if(basename($mvqnRoot) === "mvqn-ucrm" && basename($vendorRoot) === "vendor")
         {
             // IF the current folder iz 'zip' then we are probably using the preferred/template folder structure...
             if(basename($projectRoot) === "zip")
