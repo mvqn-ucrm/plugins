@@ -1,0 +1,11 @@
+.zipignore
+
+data/config.json # Test inline comment!
+data/plugin.log
+# Full line comment!
+ucrm.json
+
+#plugin-example.zip
+
+composer.php
+

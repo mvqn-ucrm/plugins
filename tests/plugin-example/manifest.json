@@ -1,0 +1,35 @@
+{
+    "version": "1",
+    "information": {
+        "name": "plugin-example",
+        "displayName": "Plugin Example",
+        "description": "An example UCRM Plugin for testing.",
+        "url": "https://github.com/mvqn-ucrm/plugin-example",
+        "version": "1.0.0",
+        "ucrmVersionCompliancy": {
+            "min": "2.14.0-beta1",
+            "max": null
+        },
+        "author": "Ryan Spaeth <rspaeth@mvqn.net>"
+    },
+    "configuration": [
+        {
+            "key": "debugEnabled",
+            "label": "Debug Enabled?",
+            "description": "If enabled, verbose debug messages are sent to the log.",
+            "required": 0,
+            "type": "checkbox"
+        },
+        {
+            "key": "language",
+            "label": "Language",
+            "description": "The desired language for notifications.",
+            "required": 0,
+            "type": "choice",
+            "choices": {
+                "English (US)": "",
+                "Spanish (ES)": "es_ES"
+            }
+        }
+    ]
+}

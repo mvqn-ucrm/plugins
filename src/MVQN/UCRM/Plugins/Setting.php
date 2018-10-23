@@ -3,7 +3,13 @@ declare(strict_types=1);
 
 namespace MVQN\UCRM\Plugins;
 
-
+/**
+ * Class Setting
+ *
+ * @package MVQN\UCRM\Plugins
+ * @author Ryan Spaeth <rspaeth@mvqn.net>
+ * @final
+ */
 final class Setting
 {
     /** @var string */
@@ -24,17 +30,21 @@ final class Setting
     /** @var array */
     public $choices = [];
 
-
-
+    /**
+     * @param array $array An array of data to use when populating the properties of this object.
+     * @throws Exceptions\ManifestElementException
+     */
     public function __construct(array $array)
     {
         if(!array_key_exists("key", $array) || $array["key"] === null || $array["key"] === "")
-            throw new \Exception("A 'key' element is missing from the 'manifest.json' file!");
+            throw new Exceptions\ManifestElementException(
+                "A 'key' element is missing from the 'manifest.json' file!");
 
         $this->key = $array["key"];
 
         if(!array_key_exists("label", $array) || $array["label"] === null || $array["label"] === "")
-            throw new \Exception("A 'label' element is missing from the 'manifest.json' file!");
+            throw new Exceptions\ManifestElementException(
+                "A 'label' element is missing from the 'manifest.json' file!");
 
         $this->label = $array["label"];
 
@@ -59,12 +69,10 @@ final class Setting
                 $this->type = "\DateTime";
                 break;
             default:
-                throw new \Exception("Unknown 'type' found in manifest.json!");
+                throw new Exceptions\ManifestElementException("Unknown 'type' found in manifest.json!");
         }
 
         $this->choices = array_key_exists("choices", $array) && $array["choices"] !== null ? $array["choices"] : [];
-
     }
-
 
 }

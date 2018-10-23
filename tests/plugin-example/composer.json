@@ -1,0 +1,36 @@
+{
+    "name": "mvqn-ucrm/plugin-example",
+    "description": "An example UCRM Plugin for testing.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ryan Spaeth",
+            "email": "rspaeth@mvqn.net"
+        }
+    ],
+    "require": {
+        "php": "~7.1",
+        "ext-json": "*",
+        "ext-zip": "*"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "MVQN\\": "../../src/MVQN/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+        }
+    },
+    "scripts": {
+        "create": [
+            "@php composer.php create"
+        ],
+        "bundle": [
+            "@composer --no-interaction --verbose dump-autoload",
+            "@php composer.php bundle"
+        ]
+    }
+}
