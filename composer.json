@@ -15,6 +15,7 @@
         "ext-curl": "*",
         "ext-json": "*",
         "ext-zip": "*",
+        "ext-posix": "*",
         "mvqn/dynamics": "~1",
         "nette/php-generator": "~3.2"
     },

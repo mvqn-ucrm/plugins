@@ -126,6 +126,62 @@ final class Plugin
         return realpath("$root/data/");
     }
 
+
+    private static function scandirRecursive(string $directory): array
+    {
+        $results = [];
+
+        foreach(scandir($directory) as $filename)
+        {
+            if ($filename[0] === "." || $filename[0] === "..")
+                continue;
+
+            $filePath = $directory . DIRECTORY_SEPARATOR . $filename;
+
+            if (is_dir($filePath))
+            {
+                foreach (self::scandirRecursive($filePath) as $childFilename)
+                {
+                    $results[] = $filename . DIRECTORY_SEPARATOR . $childFilename;
+                }
+            }
+            else
+            {
+                $results[] = $filename;
+            }
+        }
+
+        return $results;
+    }
+
+
+    public static function fixPermissions(string $user = "nginx"): int
+    {
+        $root = self::getRootPath();
+
+        $owner = posix_getpwnam($user);
+        $ownerId = $owner["uid"];
+        $groupId = $owner["gid"];
+
+        $fixed = 0;
+
+        foreach(self::scandirRecursive($root) as $filename)
+        {
+            $currentOwner = fileowner($filename);
+            $currentGroup = filegroup($filename);
+
+            if($currentOwner !== $ownerId || $currentGroup !== $groupId)
+            {
+                chown($filename, $ownerId);
+                chgrp($filename, $groupId);
+                $fixed++;
+            }
+        }
+
+        return $fixed;
+    }
+
+
     // =================================================================================================================
     // STATES
     // -----------------------------------------------------------------------------------------------------------------
