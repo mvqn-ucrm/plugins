@@ -7,6 +7,8 @@ use MVQN\UCRM\Plugins\LogEntry;
 
 /**
  * Class PluginTests
+ *
+ * @author Ryan Spaeth <rspaeth@mvqn.net>
  */
 class PluginTests extends PHPUnit\Framework\TestCase
 {
@@ -428,8 +430,8 @@ class PluginTests extends PHPUnit\Framework\TestCase
         Log::info("This is an info line!");
         Log::warning("This is a warning line!");
 
-        $line = Log::line(3);
-        echo "Log::line(3)                   = ";
+        $line = Log::line(4);
+        echo "Log::line(4)                   = ";
         echo $line."\n";
         $this->assertEquals("This is a test line 4", $line->getText());
 
@@ -497,8 +499,5 @@ class PluginTests extends PHPUnit\Framework\TestCase
 
         echo "\n";
     }
-
-
-
 
 }

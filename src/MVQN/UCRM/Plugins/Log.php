@@ -77,6 +77,24 @@ final class Log
     #region *** METHODS: WRITING
 
     /**
+     * Clears the current log file.
+     *
+     * @param bool $log Determines whether or not to add an INFO message stating the log was cleared, defaults to TRUE.
+     * @throws Exceptions\PluginNotInitializedException
+     */
+    public static function clear(bool $log = true): void
+    {
+        $logFile = self::logFile();
+
+        // Empty the file.
+        file_put_contents($logFile, "", LOCK_EX);
+
+        // IF desired, write an INFO message to the file about it being cleared!
+        if($log)
+            self::info("Log cleared!");
+    }
+
+    /**
      * Writes a message to the current log file.
      *
      * @param string $message The message to be appended to the current log file.
@@ -285,27 +303,7 @@ final class Log
 
     #endregion
 
-    // =================================================================================================================
-    // HELPERS
-    // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Clears the current log file.
-     *
-     * @param bool $log Determines whether or not to add an INFO message stating the log was cleared, defaults to TRUE.
-     * @throws Exceptions\PluginNotInitializedException
-     */
-    public static function clear(bool $log = true): void
-    {
-        $logFile = self::logFile();
-
-        // Empty the file.
-        file_put_contents($logFile, "", LOCK_EX);
-
-        // IF desired, write an INFO message to the file about it being cleared!
-        if($log)
-            self::info("Log cleared!");
-    }
+    #region *** METHODS: HELPERS
 
     /**
      * Provides a simple query to determine whether or not the current log file is empty.
@@ -322,9 +320,9 @@ final class Log
         return file_get_contents($logFile) === "";
     }
 
-    // =================================================================================================================
-    // SEARCHING
-    // -----------------------------------------------------------------------------------------------------------------
+    #endregion
+
+    #region *** METHODS: SEARCHING
 
     /**
      * A helper function to return the specified date with the time set to 00:00:00.
@@ -409,9 +407,9 @@ final class Log
         return $matching;
     }
 
-    // =================================================================================================================
-    // STORAGE
-    // -----------------------------------------------------------------------------------------------------------------
+    #endregion
+
+    #region *** METHODS: SAVING/LOADING
 
     /**
      * Serialize a timestamp-indexed array of log lines into their textual equivalent.
@@ -555,5 +553,7 @@ final class Log
 
         return self::save(Log::lines());
     }
+
+    #endregion
 
 }
