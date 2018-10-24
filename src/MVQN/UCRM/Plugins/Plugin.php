@@ -240,9 +240,10 @@ final class Plugin
      * @param string $root An optional path to root of the bundle, defaults to the root of the project.
      * @param string $name An optional name of the bundle, defaults to the root's parent folder name.
      * @param string $ignore Path to an optional .zipignore file, default is a file named .zipignore in the root folder.
+     * @param string $zipPath An optional location other than the root to which the archive should be saved.
      * @throws Exceptions\PluginNotInitializedException
      */
-    public static function bundle(string $root = "", string $name = "", string $ignore = ""): void
+    public static function bundle(string $root = "", string $name = "", string $ignore = "", string $zipPath = ""): void
     {
         // IF the root path is not specified, THEN attempt to use the initialized Plugin's root path.
         if($root === "")
@@ -308,7 +309,7 @@ final class Plugin
         }
 
         // Generate the new archive's file name.
-        $file_name = $root."/$archive_name.zip";
+        $file_name = ($zipPath !== "" ? $zipPath : $root)."/$archive_name.zip";
 
         // IF the file previously existed, THEN remove it to avoid inserting it into the new archive!
         if(file_exists($file_name))
