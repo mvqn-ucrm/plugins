@@ -14,7 +14,9 @@ use MVQN\Collections\Collection;
  */
 final class Log
 {
-    #region *** CONSTANTS
+    // =================================================================================================================
+    // CONSTANTS
+    // -----------------------------------------------------------------------------------------------------------------
 
     /** @const int The options to be used when json_encode() is called. */
     private const DEFAULT_JSON_OPTIONS = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
@@ -22,9 +24,9 @@ final class Log
     /** @const string The format of timestamps to be used for file names. */
     public const TIMESTAMP_FORMAT_DATEONLY = "Y-m-d";
 
-    #endregion
-
-    #region *** METHODS: PATHS
+    // =================================================================================================================
+    // PATHS
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Provides the path to the current log file.
@@ -72,9 +74,9 @@ final class Log
         return realpath($path) ?: $path;
     }
 
-    #endregion
-
-    #region *** METHODS: WRITING
+    // =================================================================================================================
+    // WRITING
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Clears the current log file.
@@ -204,9 +206,9 @@ final class Log
             return $entry;
     }
 
-    #endregion
-
-    #region *** METHODS: VIEWING
+    // =================================================================================================================
+    // VIEWING
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Reads the specified number of lines from a starting position in the current log file.
@@ -301,9 +303,9 @@ final class Log
     }
 
 
-    #endregion
-
-    #region *** METHODS: HELPERS
+    // =================================================================================================================
+    // HELPERS
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Provides a simple query to determine whether or not the current log file is empty.
@@ -320,9 +322,9 @@ final class Log
         return file_get_contents($logFile) === "";
     }
 
-    #endregion
-
-    #region *** METHODS: SEARCHING
+    // =================================================================================================================
+    // SEARCHING
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * A helper function to return the specified date with the time set to 00:00:00.
@@ -407,9 +409,9 @@ final class Log
         return $matching;
     }
 
-    #endregion
-
-    #region *** METHODS: SAVING/LOADING
+    // =================================================================================================================
+    // SAVING/LOADING
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Serialize a timestamp-indexed array of log lines into their textual equivalent.
@@ -553,7 +555,5 @@ final class Log
 
         return self::save(Log::lines());
     }
-
-    #endregion
 
 }
