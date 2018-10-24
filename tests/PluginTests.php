@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use MVQN\UCRM\Plugins\Plugin;
 use MVQN\UCRM\Plugins\Log;
+use MVQN\UCRM\Plugins\LogEntry;
 
 /**
  * Class PluginTests
@@ -255,14 +256,114 @@ class PluginTests extends PHPUnit\Framework\TestCase
     // LOGGING
     // -----------------------------------------------------------------------------------------------------------------
 
-    public function testLogClear()
+    public function testLogFile()
     {
         Plugin::initialize(__DIR__."/plugin-example/");
 
-        echo "Log::clear()                   > ";
-        Log::clear();
-        $this->assertCount(0, Log::lines());
-        echo "CLEARED!\n";
+        $logFile = Log::logFile();
+        echo "Log::logFile()                 = $logFile\n";
+        $this->assertFileExists(Plugin::getDataPath()."/plugin.log");
+
+        echo "\n";
+    }
+
+    public function testLogsPath()
+    {
+        Plugin::initialize(__DIR__."/plugin-example/");
+
+        $logsPath = Log::logsPath();
+        echo "Log::logsPath()                = $logsPath\n";
+        $this->assertDirectoryExists(Plugin::getDataPath()."/logs/");
+
+        $logsPath = Log::logsPath(new DateTimeImmutable("10/20/2018"));
+        echo "Log::logsPath('10/20/2018')    = $logsPath\n";
+        $this->assertFileExists(Plugin::getDataPath()."/logs/2018-10-20.log");
+
+        echo "\n";
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    public function testLogWrite()
+    {
+        Plugin::initialize(__DIR__."/plugin-example/");
+
+        $message = "This is a test message!";
+        echo "Log::write('$message')         = ".Log::write($message)."\n";
+        $this->assertEquals($message, Log::line(-1)->getText());
+
+        echo "\n";
+    }
+
+    public function testLogWriteArray()
+    {
+        Plugin::initialize(__DIR__."/plugin-example/");
+
+        $array = [ "testNumber" => 1, "testType" => "string", "testDate" => new DateTimeImmutable() ];
+        echo "Log::writeArray(array)         = ".Log::writeArray($array)."\n";
+        $this->assertEquals(
+            json_encode($array, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (string)Log::line(-1)->getText());
+
+        echo "\n";
+    }
+
+    public function testLogWriteObject()
+    {
+        Plugin::initialize(__DIR__."/plugin-example/");
+
+        $entry = new LogEntry(new DateTimeImmutable(), LogEntry::SEVERITY_WARNING, "This is a test!");
+        echo "Log::writeObject(entry)        = ".Log::writeObject($entry)."\n";
+        $this->assertEquals(
+            json_encode($entry, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (string)Log::line(-1)->getText());
+
+        echo "\n";
+    }
+
+    public function testLogDebug()
+    {
+        Plugin::initialize(__DIR__."/plugin-example/");
+
+        $message = "This is a test message!";
+        echo "Log::debug(message)            = ".Log::debug($message)."\n";
+        $this->assertEquals($message, Log::line(-1)->getText());
+
+        echo "\n";
+    }
+
+    public function testLogInfo()
+    {
+        Plugin::initialize(__DIR__."/plugin-example/");
+
+        $message = "This is a test message!";
+        echo "Log::info(message)             = ".Log::info($message)."\n";
+        $this->assertEquals($message, Log::line(-1)->getText());
+
+        echo "\n";
+    }
+
+    public function testLogWarning()
+    {
+        Plugin::initialize(__DIR__."/plugin-example/");
+
+        $message = "This is a test message!";
+        echo "Log::warning(message)          = ".Log::warning($message)."\n";
+        $this->assertEquals($message, Log::line(-1)->getText());
+
+        echo "\n";
+    }
+
+    public function testLogError()
+    {
+        Plugin::initialize(__DIR__."/plugin-example/");
+
+        $message = "This is a test message!";
+        echo "Log::error(message)            = ".Log::error($message)."\n";
+        $this->assertEquals($message, Log::line(-1)->getText());
+
+        $exception = \MVQN\UCRM\Plugins\Exceptions\PluginNotInitializedException::class;
+        $this->expectException($exception);
+        $message = "This is a test message!";
+        echo "Log::error(message, exception) = ".Log::error($message, $exception)."\n";
 
         echo "\n";
     }
@@ -276,20 +377,18 @@ class PluginTests extends PHPUnit\Framework\TestCase
 
         Log::write("This is a test line 1");
         Log::write("This is a test line 2");
-        Log::write("This is a test line 3");
-        Log::write("This is a test line 4");
-        Log::write("This is a test line 5");
+        Log::write("This is a test line 3 ");
+        Log::write("This is a test line 4   ");
+
+        Log::debug("This is a debug line!");
+        Log::info("This is an info line!");
+        Log::warning("This is a warning line!");
 
         $lines = Log::lines(1, 3);
         echo "Log::lines(1, 3)               >\n";
-        print_r($lines);
+        echo $lines."\n";
         $this->assertCount(3, $lines);
-        echo "\n";
 
-        $lines = Log::lines(1, 3, true);
-        echo "Log::lines(1, 3, true)         >\n";
-        print_r($lines);
-        $this->assertCount(3, $lines);
         echo "\n";
     }
 
@@ -300,20 +399,18 @@ class PluginTests extends PHPUnit\Framework\TestCase
 
         Log::write("This is a test line 1");
         Log::write("This is a test line 2");
-        Log::write("This is a test line 3");
-        Log::write("This is a test line 4");
-        Log::write("This is a test line 5");
+        Log::write("This is a test line 3 ");
+        Log::write("This is a test line 4   ");
+
+        Log::debug("This is a debug line!");
+        Log::info("This is an info line!");
+        Log::warning("This is a warning line!");
 
         $lines = Log::tail(2);
         echo "Log::tail(2)                   >\n";
-        print_r($lines);
+        echo $lines."\n";
         $this->assertCount(2, $lines);
-        echo "\n";
 
-        $lines = Log::tail(2, true);
-        echo "Log::tail(2, true)             >\n";
-        print_r($lines);
-        $this->assertCount(2, $lines);
         echo "\n";
     }
 
@@ -324,64 +421,81 @@ class PluginTests extends PHPUnit\Framework\TestCase
 
         Log::write("This is a test line 1");
         Log::write("This is a test line 2");
-        Log::write("This is a test line 3");
-        Log::write("This is a test line 4");
-        Log::write("This is a test line 5");
+        Log::write("This is a test line 3 ");
+        Log::write("This is a test line 4   ");
+
+        Log::debug("This is a debug line!");
+        Log::info("This is an info line!");
+        Log::warning("This is a warning line!");
 
         $line = Log::line(3);
         echo "Log::line(3)                   = ";
-        print_r($line);
-        $this->assertEquals("This is a test line 4", $line);
-        echo "\n";
+        echo $line."\n";
+        $this->assertEquals("This is a test line 4", $line->getText());
 
-        $line = Log::line(2, true);
-        echo "Log::line(2, true)             = ";
-        print_r($line);
-        $this->assertStringEndsWith("] This is a test line 3", $line);
         echo "\n";
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    public function testLogWrite()
+    public function testLogClear()
     {
         Plugin::initialize(__DIR__."/plugin-example/");
 
-        $message = "This is a test message!";
-        echo "Log::write('$message')\n";
-        Log::write($message);
-        $this->assertEquals($message, Log::line(-1, false));
+        echo "Log::clear()                   > ";
+        Log::clear();
+        echo "CLEARED!\n";
+        $this->assertCount(1, Log::lines());
+
         echo "\n";
     }
 
+    public function testLogIsEmpty()
+    {
+        Plugin::initialize(__DIR__."/plugin-example/");
+        Log::clear();
+
+        Log::write("This is a test line!");
+
+        echo "Log::isEmpty()                 = ".(Log::isEmpty() ? "TRUE" : "FALSE")."\n";
+        $this->assertFalse(Log::isEmpty());
+
+        Log::clear(false);
+        echo "Log::isEmpty()                 = ".(Log::isEmpty() ? "TRUE" : "FALSE")."\n";
+        $this->assertTrue(Log::isEmpty());
+
+        echo "\n";
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
-
-
 
     public function testBetween()
     {
         Plugin::initialize(__DIR__."/plugin-example/");
+        Log::clear();
 
-        $lines = Log::between(new DateTime("2018-10-20 17:49:10"), new DateTime(), true);
+        $lines = Log::between(new DateTimeImmutable("2018-10-20 17:49:10"), new DateTimeImmutable("2018-10-22"));
+        echo "Log::between(start, end)       = [{$lines->count()}] $lines\n";
+        $this->assertCount(7, $lines);
 
-        $test = Log::load(new DateTime("2018-10-22"));
+        $lines = Log::between(new DateTimeImmutable("2018-10-20 17:49:10"));
+        echo "Log::between(start)            = [{$lines->count()}] $lines\n";
+        $this->assertCount(7 + Log::lines()->count(), $lines);
 
         echo "";
     }
 
-
-
-
     // -----------------------------------------------------------------------------------------------------------------
-
-
 
     public function testRotate()
     {
         Plugin::initialize(__DIR__."/plugin-example/");
 
-        Log::rotate();
+        $today = new DateTimeImmutable((new DateTime())->format(Log::TIMESTAMP_FORMAT_DATEONLY));
+        echo "Log::rotate()                  = ".Log::rotate()."\n";
+        $this->assertCount(Log::lines()->count(), Log::between($today));
+
+        echo "\n";
     }
 
 
