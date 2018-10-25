@@ -169,7 +169,7 @@ final class Plugin
 
         foreach(self::scandirRecursive($root) as $filename)
         {
-            $file = $root.DIRECTORY_SEPARATOR.$filename;
+            $file = $root."/".$filename;
 
             $currentOwner = fileowner($file);
             $currentGroup = filegroup($file);
@@ -264,7 +264,7 @@ final class Plugin
         }
 
         // OTHERWISE, load all the lines from the ignore file.
-        $lines = explode(PHP_EOL, file_get_contents($ignore));
+        $lines = explode("\n", file_get_contents($ignore));
 
         // Set a clean cache collection.
         $cache = [];
