@@ -140,6 +140,8 @@ final class Plugin
 
             if (is_dir($filePath))
             {
+                $results[] = $filename;
+
                 foreach (self::scandirRecursive($filePath) as $childFilename)
                 {
                     $results[] = $filename . DIRECTORY_SEPARATOR . $childFilename;
@@ -155,7 +157,7 @@ final class Plugin
     }
 
 
-    public static function fixPermissions(string $user = "nginx"): int
+    public static function fixPermissions(string $user = "nginx"): array
     {
         $root = self::getRootPath();
 
@@ -163,21 +165,47 @@ final class Plugin
         $ownerId = $owner["uid"];
         $groupId = $owner["gid"];
 
-        $fixed = 0;
+        $fixed = [];
 
         foreach(self::scandirRecursive($root) as $filename)
         {
-            $currentOwner = fileowner($filename);
-            $currentGroup = filegroup($filename);
+            $file = $root.DIRECTORY_SEPARATOR.$filename;
 
-            if($currentOwner !== $ownerId || $currentGroup !== $groupId)
+            $currentOwner = fileowner($file);
+            $currentGroup = filegroup($file);
+
+            $currentPerms = intval(substr(sprintf('%o', fileperms($file)), -4), 8);
+            $permissions = is_dir($file) ? 0775 : 0664;
+
+            if($currentOwner !== $ownerId)
             {
-                chown($filename, $ownerId);
-                chgrp($filename, $groupId);
-                $fixed++;
+                $fixed[$file]["owner"] = sprintf("%d -> %d", $currentOwner, $ownerId);
+                chown($file, $ownerId);
+            }
+
+            if($currentGroup !== $groupId)
+            {
+                $fixed[$file]["group"] = sprintf("%d -> %d", $currentGroup, $groupId);
+                chgrp($file, $groupId);
+            }
+
+            if($currentPerms !== $permissions)
+            {
+                $fixed[$file]["perms"] = sprintf("%04o -> %04o", $currentPerms, $permissions);
+                chmod($file, $permissions);
             }
         }
 
+        /*
+        $text = "";
+
+        foreach($fixed as $filename => $changes)
+        {
+            $text .= "$filename : ".json_encode($changes)."\n";
+        }
+
+        file_put_contents($root.DIRECTORY_SEPARATOR."fixed.txt", $text);
+        */
         return $fixed;
     }
 
