@@ -16,7 +16,7 @@
         "ext-json": "*",
         "ext-zip": "*",
         "ext-pdo": "*",
-        "ext-posix": "*",
+
         "mvqn/data": "~1",
         "mvqn/dynamics": "~1",
         "mvqn-ucrm/data": "~1",
