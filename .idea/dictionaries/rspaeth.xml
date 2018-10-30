@@ -3,11 +3,16 @@
     <words>
       <w>classname</w>
       <w>compliancy</w>
+      <w>crpyto</w>
+      <w>crypto</w>
       <w>dateonly</w>
+      <w>dbname</w>
       <w>mvqn</w>
+      <w>pgsql</w>
       <w>scandir</w>
       <w>spaeth</w>
       <w>textarea</w>
+      <w>ucfirst</w>
       <w>ucrm</w>
       <w>uninitialize</w>
       <w>zipignore</w>

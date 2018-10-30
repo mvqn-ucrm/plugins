@@ -13,3 +13,4 @@ namespace MVQN\UCRM\Plugins\Exceptions;
 final class RequiredFileNotFoundException extends \Exception
 {
 }
+

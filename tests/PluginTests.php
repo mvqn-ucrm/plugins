@@ -5,6 +5,12 @@ use MVQN\UCRM\Plugins\Plugin;
 use MVQN\UCRM\Plugins\Log;
 use MVQN\UCRM\Plugins\LogEntry;
 
+use MVQN\Data\Database;
+use MVQN\UCRM\Data\Models\Option;
+
+use Dotenv\Dotenv;
+use Defuse\Crypto\Key;
+
 /**
  * Class PluginTests
  *
@@ -12,6 +18,22 @@ use MVQN\UCRM\Plugins\LogEntry;
  */
 class PluginTests extends PHPUnit\Framework\TestCase
 {
+    protected function setUp()
+    {
+        $env = new Dotenv(__DIR__);
+        $env->load();
+
+        Database::connect(
+            getenv("POSTGRES_HOST"),
+            (int)getenv("POSTGRES_PORT"),
+            getenv("POSTGRES_DB"),
+            getenv("POSTGRES_USER"),
+            getenv("POSTGRES_PASSWORD")
+        );
+
+    }
+
+
     // =================================================================================================================
     // HELPERS
     // -----------------------------------------------------------------------------------------------------------------
@@ -499,5 +521,78 @@ class PluginTests extends PHPUnit\Framework\TestCase
 
         echo "\n";
     }
+
+    // =================================================================================================================
+    // ENCRYPTION
+    // -----------------------------------------------------------------------------------------------------------------
+
+    public function testCrpytoKey()
+    {
+        Plugin::initialize(__DIR__."/plugin-example/");
+
+        $key = Plugin::getCryptoKey();
+        echo "Plugin::getCryptoKey()         = ".$key->saveToAsciiSafeString()."\n";
+        $this->assertNotNull($key);
+
+        echo "\n";
+    }
+
+    public function testDecrypt()
+    {
+        Plugin::initialize(__DIR__."/plugin-example/");
+
+        $hash = "def50200621560ec3ccd81dd4c62c77c43aec5d9b107ad1167c577af73dc7ca8d168206f3dd30cc67c784e74d050b71b414afa965cdbf7a4bab8a94a08495ff208199a1ad68c128cbb916d6aa5aa7aea283de7602a9656aa1768fe6a";
+
+        /*
+        $key = Plugin::getCryptoKey();
+        echo "Plugin::getCryptoKey()         = ".$key->saveToAsciiSafeString()."\n";
+        $this->assertNull($key);
+
+        echo "\$hash                          = ".$hash."\n";
+
+        $password = Plugin::decrypt($hash, $key);
+        echo "Plugin::decrypt(hash, key)     = ".$password."\n";
+        $this->assertEquals("P@ssw0rd", $password);
+        */
+        $keyHash = "def00000ba635b8bbb98f32d203b2a2de2e12bc207ac8baeb4286114d58d94c18a53a592204d2ab1ba4b8f8c634451e6da1a5220390605273bba3fd92a100026cd4762a2";
+        $key = Key::loadFromAsciiSafeString($keyHash);
+
+        $password = Plugin::decrypt($hash, $key);
+        echo "Plugin::decrypt(hash, key)     = ".$password."\n";
+        $this->assertEquals("P@ssw0rd", $password);
+
+        echo "\n";
+    }
+
+    public function testEncrypt()
+    {
+        Plugin::initialize(__DIR__."/plugin-example/");
+
+        $key = Plugin::getCryptoKey();
+        echo "Plugin::getCryptoKey()         = ".$key->saveToAsciiSafeString()."\n";
+        $this->assertNotNull($key);
+
+        $passwordHash = Plugin::encrypt("P@ssw0rd", $key);
+        echo "Plugin::encrypt(P@ssw0rd, key) = ".$passwordHash."\n";
+        $password = Plugin::decrypt($passwordHash, $key);
+        echo "Plugin::encrypt(hash, key)     = ".$password."\n";
+        $this->assertEquals("P@ssw0rd", $password);
+
+        echo "\n";
+    }
+
+    // =================================================================================================================
+    // DATABASE
+    // -----------------------------------------------------------------------------------------------------------------
+
+    public function testDatabaseOption()
+    {
+        $options = Option::select();
+        echo $options;
+
+    }
+
+
+
 
 }

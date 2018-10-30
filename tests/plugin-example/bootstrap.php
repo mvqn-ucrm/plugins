@@ -16,3 +16,4 @@ Plugin::createSettings();
 if(file_exists(__DIR__."/.env"))
     $env = (new \Dotenv\Dotenv(__DIR__))->load();
 
+

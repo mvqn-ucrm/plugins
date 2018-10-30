@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace MVQN\UCRM\Plugins;
 
+use Defuse\Crypto\Crypto;
+use Defuse\Crypto\Key;
 use Nette\PhpGenerator\PhpNamespace;
 
 /**
@@ -643,5 +645,39 @@ final class Plugin
         // Finally, return success!
         return true;
     }
+
+
+
+    public static function getCryptoKey(): ?Key
+    {
+        $path = Plugin::getRootPath()."/../../encryption/crypto.key";
+
+        if(file_exists($path))
+            return Key::loadFromAsciiSafeString(file_get_contents($path));
+
+        return null;
+    }
+
+    public static function decrypt(string $string, Key $key = null): ?string
+    {
+        $key = $key ?? self::getCryptoKey();
+
+        if($key === null)
+            return null;
+
+        return Crypto::decrypt($string, $key);
+    }
+
+    public static function encrypt(string $string, Key $key = null): ?string
+    {
+        $key = $key ?? self::getCryptoKey();
+
+        if($key === null)
+            return null;
+
+        return Crypto::encrypt($string, $key);
+    }
+
+
 
 }

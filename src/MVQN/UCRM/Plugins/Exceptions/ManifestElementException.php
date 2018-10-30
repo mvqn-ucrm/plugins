@@ -13,3 +13,4 @@ namespace MVQN\UCRM\Plugins\Exceptions;
 final class ManifestElementException extends \Exception
 {
 }
+
