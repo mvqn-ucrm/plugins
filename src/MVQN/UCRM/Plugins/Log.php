@@ -206,6 +206,18 @@ final class Log
             return $entry;
     }
 
+    public static function http(string $message, int $statusCode, bool $die = true): LogEntry
+    {
+        $entry = self::write($message, "HTTP");
+
+        http_response_code($statusCode);
+
+        if($die)
+            die($message);
+        else
+            return $entry;
+    }
+
     // =================================================================================================================
     // VIEWING
     // -----------------------------------------------------------------------------------------------------------------
