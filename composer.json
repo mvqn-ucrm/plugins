@@ -17,9 +17,9 @@
         "ext-zip": "*",
         "ext-pdo": "*",
 
-        "mvqn/data": "~1",
-        "mvqn/dynamics": "~1",
-        "mvqn-ucrm/data": "~1",
+        "mvqn/data": "1.*",
+        "mvqn/dynamics": "1.*",
+        "mvqn-ucrm/data": "1.*",
         "nette/php-generator": "~3.2",
         "defuse/php-encryption": "~2.2"
     },

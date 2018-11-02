@@ -555,6 +555,7 @@ final class Plugin
         // Generate the code for the Settings file.
         $code =
             "<?php\n".
+            "/** @noinspection SpellCheckingInspection */".
             "declare(strict_types=1);\n".
             "\n".
             $_namespace;
