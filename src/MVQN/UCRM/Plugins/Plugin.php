@@ -528,6 +528,14 @@ final class Plugin
                     ->setVisibility("public")
                     ->addComment("@const string The publicly accessible URL assigned to this Plugin by the UCRM.");
             }
+            else
+            {
+
+                $_class->addConstant("PLUGIN_PUBLIC_URL", $ucrm["ucrmPublicUrl"].
+                    "_plugins/{$manifest["information"]["name"]}/public.php")
+                    ->setVisibility("public")
+                    ->addComment("@const string The publicly accessible URL assigned to this Plugin by the UCRM.");
+            }
 
             $_class->addConstant("PLUGIN_APP_KEY", $ucrm["pluginAppKey"])
                 ->setVisibility("public")
