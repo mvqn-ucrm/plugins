@@ -451,7 +451,7 @@ final class Plugin
      * @throws Exceptions\PluginNotInitializedException
      */
     public static function createSettings(string $namespace = self::DEFAULT_SETTINGS_NAMESPACE,
-        string $class = self::DEFAULT_SETTINGS_CLASSNAME): void
+                                          string $class = self::DEFAULT_SETTINGS_CLASSNAME): void
     {
         // Get the root path for this Plugin, throws an Exception if not already initialized.
         $root = self::getRootPath();
@@ -482,6 +482,20 @@ final class Plugin
             ->addComment("@author Ryan Spaeth <rspaeth@mvqn.net>\n");
 
         // Set any desired constants to be included in the Settings file by default...
+
+        $_class->addConstant("PROJECT_NAME", basename(realpath(Plugin::getRootPath()."/../")))
+            ->setVisibility("public")
+            ->addComment("@const string The name of this Project, based on the root folder name.");
+
+        $_class->addConstant("PROJECT_ROOT_PATH", realpath(Plugin::getRootPath()."/../"))
+            ->setVisibility("public")
+            ->addComment("@const string The absolute path to this Project's root folder.");
+
+        $manifest = json_decode(file_get_contents(Plugin::getRootPath()."/manifest.json"), true);
+
+        $_class->addConstant("PLUGIN_NAME", $manifest["information"]["name"])
+            ->setVisibility("public")
+            ->addComment("@const string The name of this Project, based on the root folder name.");
 
         $_class->addConstant("PLUGIN_ROOT_PATH", Plugin::getRootPath())
             ->setVisibility("public")
